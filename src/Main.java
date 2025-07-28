@@ -83,21 +83,30 @@ public class Main {
     }
 
     public static BigInteger lagrangeInterpolation(BigInteger x, List<BigInteger> xi, List<BigInteger> yi) {
-        BigDecimal result = BigDecimal.ZERO;
+        BigInteger resultNumerator = BigInteger.ZERO;
+        BigInteger resultDenominator = BigInteger.ONE;
         int k = xi.size();
 
         for (int i = 0; i < k; i++) {
-            BigDecimal term = new BigDecimal(yi.get(i));
+            BigInteger termNumerator = yi.get(i);
+            BigInteger termDenominator = BigInteger.ONE;
+
             for (int j = 0; j < k; j++) {
                 if (i != j) {
-                    BigDecimal numerator = new BigDecimal(x.subtract(xi.get(j)));
-                    BigDecimal denominator = new BigDecimal(xi.get(i).subtract(xi.get(j)));
-                    term = term.multiply(numerator.divide(denominator, 100, BigDecimal.ROUND_HALF_UP));
+                    termNumerator = termNumerator.multiply(x.subtract(xi.get(j)));
+                    termDenominator = termDenominator.multiply(xi.get(i).subtract(xi.get(j)));
                 }
             }
-            result = result.add(term);
+
+            
+            BigInteger commonDenominator = resultDenominator.multiply(termDenominator);
+            BigInteger newNumerator = resultNumerator.multiply(termDenominator).add(termNumerator.multiply(resultDenominator));
+            resultNumerator = newNumerator;
+            resultDenominator = commonDenominator;
         }
 
-        return result.setScale(0, BigDecimal.ROUND_HALF_UP).toBigInteger();
+        
+        return resultNumerator.divide(resultDenominator);
     }
+
 }
